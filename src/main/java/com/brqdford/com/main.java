@@ -2,7 +2,6 @@ package com.brqdford.com;
 
 
 import com.google.inject.Inject;
-import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
@@ -13,10 +12,8 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.block.TickBlockEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.game.state.GameStoppingEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scoreboard.Scoreboard;
@@ -24,9 +21,6 @@ import org.spongepowered.api.scoreboard.Team;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Locale;
 import java.util.Random;
 
 
@@ -228,4 +222,19 @@ public class main {
                 .build();
         Sponge.getCommandManager().register(container, commandman, "role");
     }
+
+
+    @Listener
+    public void onPlayerJoin(ClientConnectionEvent.Join e){
+        Player p = e.getTargetEntity();
+        Scoreboard scoreboard = p.getScoreboard();
+            Random random = new Random();
+
+            int nnumber = random.nextInt(999999999);
+
+            Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§f")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).build();
+            teams.addMember(p.getTeamRepresentation());
+            scoreboard.registerTeam(teams);
+    }
+
 }
