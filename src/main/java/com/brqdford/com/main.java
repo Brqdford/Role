@@ -10,7 +10,10 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.tab.TabList;
+import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -21,6 +24,7 @@ import org.spongepowered.api.scoreboard.Team;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.util.Optional;
 import java.util.Random;
 
 
@@ -64,10 +68,17 @@ public class main {
                         Random random = new Random();
 
                         int nnumber = random.nextInt(999999999);
-
+                        TabList tabList = player.getTabList();
                         Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§f")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).build();
                         teams.addMember(player.getTeamRepresentation());
                         scoreboard.registerTeam(teams);
+                        Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                            Optional<TabListEntry> opEntry = tabList.getEntry(p.getUniqueId());
+                            if(!opEntry.isPresent()){
+                                return;
+                            }
+                            opEntry.get().setDisplayName(Text.of(p.getName()));
+                        });
 
                         src.sendMessage(Text.of(TextColors.GREEN, "Your role has been cleared."));
                     }else if (message.toLowerCase().contains("NIGGER".toLowerCase())) {
@@ -209,11 +220,17 @@ public class main {
                         Random random = new Random();
 
                         int nnumber = random.nextInt(999999999);
-
+                        TabList tabList = player.getTabList();
                         Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("[",TextColors.DARK_AQUA, message,TextColors.WHITE, "]")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).build();
                         teams.addMember(player.getTeamRepresentation());
                         scoreboard.registerTeam(teams);
-
+                        Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                            Optional<TabListEntry> opEntry = tabList.getEntry(p.getUniqueId());
+                            if(!opEntry.isPresent()){
+                                return;
+                            }
+                            opEntry.get().setDisplayName(Text.of(p.getName()));
+                        });
                         src.sendMessage(Text.of(TextColors.GREEN, "Your role has been changed to ", message, "."));
                     }
 
@@ -226,15 +243,23 @@ public class main {
 
     @Listener
     public void onPlayerJoin(ClientConnectionEvent.Join e){
-        Player p = e.getTargetEntity();
-        Scoreboard scoreboard = p.getScoreboard();
+        Player player = e.getTargetEntity();
+        TabList tabList = player.getTabList();
+        Scoreboard scoreboard = player.getScoreboard();
             Random random = new Random();
 
             int nnumber = random.nextInt(999999999);
 
             Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§f")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).build();
-            teams.addMember(p.getTeamRepresentation());
+            teams.addMember(player.getTeamRepresentation());
             scoreboard.registerTeam(teams);
+        Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+            Optional<TabListEntry> opEntry = tabList.getEntry(p.getUniqueId());
+            if(!opEntry.isPresent()){
+                return;
+            }
+            opEntry.get().setDisplayName(Text.of(p.getName()));
+        });
     }
 
 }
