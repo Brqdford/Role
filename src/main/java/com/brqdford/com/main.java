@@ -11,21 +11,27 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
+import org.spongepowered.api.data.manipulator.mutable.PotionEffectData;
+import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.Team;
+import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Tristate;
 
-import java.util.Optional;
-import java.util.Random;
+import java.time.Instant;
+import java.util.*;
 
 
 @Plugin(id = "roleplugin", name = "Roleplugin", version = "1.0", description = "rolegiver", authors = "Brqdford")
@@ -41,20 +47,19 @@ public class main {
 
     private static main instance;
 
+    public static HashMap<String, Instant> cooldown = new HashMap<>();
 
     @Listener
     public void onPreInit(GameInitializationEvent e) {
         instance = this;
     }
     Scoreboard scoreboard;
-
     @Listener
     public void onGameInit(GameInitializationEvent e) {
         logger.info(container.getName() +
                 " running (version "
                 + container.getVersion().orElse("UNSTABLE")
                 + ")");
-
 
         CommandSpec commandman = CommandSpec.builder()
                 .arguments(
@@ -65,22 +70,61 @@ public class main {
                     Player player = (Player) src;
                     scoreboard = player.getScoreboard();
                     if (message.equalsIgnoreCase("clear")){
-                        Random random = new Random();
+                        if (cooldown.containsKey(player.getName()) && Instant.now().minusSeconds(((Instant)cooldown.get(player.getName())).getEpochSecond()).getEpochSecond() < 10L) {
+                            player.sendMessage((Text)Text.of("§cYou must wait " + (10L - Instant.now().minusSeconds(((Instant)cooldown.get(player.getName())).getEpochSecond()).getEpochSecond()) + " seconds to use this command."));
+                            return CommandResult.success();
+                        }else {
+                            if (src.hasPermission("tabmanager.group.blue")) {
+                                cooldown.put(player.getName(), Instant.now());
+                                Random random = new Random();
+                                int nnumber = random.nextInt(999999999);
+                                Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§b")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).color(TextColors.AQUA).build();
+                                teams.addMember(player.getTeamRepresentation());
+                                scoreboard.registerTeam(teams);
+                                src.sendMessage(Text.of(TextColors.GREEN, "Your role has been cleared."));
+                                Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                                    TabList tabList = p.getTabList();
+                                    Optional<TabListEntry> opEntry = tabList.getEntry(player.getUniqueId());
+                                    if(!opEntry.isPresent()){
+                                        return;
+                                    }
+                                    opEntry.get().setDisplayName(Text.of(TextColors.AQUA, player.getName()));
+                                });
+                            } else if (src.hasPermission("tabmanager.group.pink")) {
+                                cooldown.put(player.getName(), Instant.now());
+                                Random random = new Random();
+                                int nnumber = random.nextInt(999999999);
+                                Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§d")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).color(TextColors.LIGHT_PURPLE).build();
+                                teams.addMember(player.getTeamRepresentation());
+                                scoreboard.registerTeam(teams);
+                                src.sendMessage(Text.of(TextColors.GREEN, "Your role has been cleared."));
+                                Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                                    TabList tabList = p.getTabList();
+                                    Optional<TabListEntry> opEntry = tabList.getEntry(player.getUniqueId());
+                                    if(!opEntry.isPresent()){
+                                        return;
+                                    }
+                                    opEntry.get().setDisplayName(Text.of(TextColors.LIGHT_PURPLE, player.getName()));
+                                });
+                            } else {
+                                cooldown.put(player.getName(), Instant.now());
+                                Random random = new Random();
+                                int nnumber = random.nextInt(999999999);
+                                Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§f")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).build();
+                                teams.addMember(player.getTeamRepresentation());
+                                scoreboard.registerTeam(teams);
+                                src.sendMessage(Text.of(TextColors.GREEN, "Your role has been cleared."));
+                                Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                                    TabList tabList = p.getTabList();
+                                    Optional<TabListEntry> opEntry = tabList.getEntry(player.getUniqueId());
+                                    if(!opEntry.isPresent()){
+                                        return;
+                                    }
+                                    opEntry.get().setDisplayName(Text.of(TextColors.WHITE, player.getName()));
+                                });
 
-                        int nnumber = random.nextInt(999999999);
-                        TabList tabList = player.getTabList();
-                        Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§f")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).build();
-                        teams.addMember(player.getTeamRepresentation());
-                        scoreboard.registerTeam(teams);
-                        Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
-                            Optional<TabListEntry> opEntry = tabList.getEntry(p.getUniqueId());
-                            if(!opEntry.isPresent()){
-                                return;
                             }
-                            opEntry.get().setDisplayName(Text.of(p.getName()));
-                        });
-
-                        src.sendMessage(Text.of(TextColors.GREEN, "Your role has been cleared."));
+                        }
                     }else if (message.toLowerCase().contains("NIGGER".toLowerCase())) {
                         src.sendMessage(Text.of(TextColors.RED, "You are not allowed to set this as your role."));
                     }else if (message.toLowerCase().contains("NIGGA".toLowerCase())) {
@@ -216,22 +260,60 @@ public class main {
                     }else if (message.length() >= 11){
                         src.sendMessage(Text.of(TextColors.RED, "Too many characters role can only be 10 characters or less."));
                     }else {
-
-                        Random random = new Random();
-
-                        int nnumber = random.nextInt(999999999);
-                        TabList tabList = player.getTabList();
-                        Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("[",TextColors.DARK_AQUA, message,TextColors.WHITE, "]")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).build();
-                        teams.addMember(player.getTeamRepresentation());
-                        scoreboard.registerTeam(teams);
-                        Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
-                            Optional<TabListEntry> opEntry = tabList.getEntry(p.getUniqueId());
-                            if(!opEntry.isPresent()){
-                                return;
+                        if (cooldown.containsKey(player.getName()) && Instant.now().minusSeconds(((Instant) cooldown.get(player.getName())).getEpochSecond()).getEpochSecond() < 10L) {
+                            player.sendMessage((Text) Text.of("§cYou must wait " + (10L - Instant.now().minusSeconds(((Instant) cooldown.get(player.getName())).getEpochSecond()).getEpochSecond()) + " seconds to use this command."));
+                            return CommandResult.success();
+                        } else {
+                            if (src.hasPermission("tabmanager.group.blue")) {
+                                cooldown.put(player.getName(), Instant.now());
+                                Random random = new Random();
+                                int nnumber = random.nextInt(999999999);
+                                Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("[", TextColors.DARK_AQUA, message, TextColors.WHITE, "]", TextColors.AQUA)).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).color(TextColors.AQUA).build();
+                                teams.addMember(player.getTeamRepresentation());
+                                scoreboard.registerTeam(teams);
+                                src.sendMessage(Text.of(TextColors.GREEN, "Your role has been changed to ", message, "."));
+                                Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                                    TabList tabList = p.getTabList();
+                                    Optional<TabListEntry> opEntry = tabList.getEntry(player.getUniqueId());
+                                    if(!opEntry.isPresent()){
+                                        return;
+                                    }
+                                    opEntry.get().setDisplayName(Text.of(TextColors.AQUA, player.getName()));
+                                });
+                            } else if (src.hasPermission("tabmanager.group.pink")) {
+                                cooldown.put(player.getName(), Instant.now());
+                                Random random = new Random();
+                                int nnumber = random.nextInt(999999999);
+                                Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("[", TextColors.DARK_AQUA, message, TextColors.WHITE, "]", TextColors.LIGHT_PURPLE)).allowFriendlyFire(true).color(TextColors.LIGHT_PURPLE).canSeeFriendlyInvisibles(false).build();
+                                teams.addMember(player.getTeamRepresentation());
+                                scoreboard.registerTeam(teams);
+                                src.sendMessage(Text.of(TextColors.GREEN, "Your role has been changed to ", message, "."));
+                                Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                                    TabList tabList = p.getTabList();
+                                    Optional<TabListEntry> opEntry = tabList.getEntry(player.getUniqueId());
+                                    if(!opEntry.isPresent()){
+                                        return;
+                                    }
+                                    opEntry.get().setDisplayName(Text.of(TextColors.LIGHT_PURPLE, player.getName()));
+                                });
+                            } else {
+                                cooldown.put(player.getName(), Instant.now());
+                                Random random = new Random();
+                                int nnumber = random.nextInt(999999999);
+                                Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("[", TextColors.DARK_AQUA, message, TextColors.WHITE, "]")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).build();
+                                teams.addMember(player.getTeamRepresentation());
+                                scoreboard.registerTeam(teams);
+                                src.sendMessage(Text.of(TextColors.GREEN, "Your role has been changed to ", message, "."));
+                                Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                                    TabList tabList = p.getTabList();
+                                    Optional<TabListEntry> opEntry = tabList.getEntry(player.getUniqueId());
+                                    if(!opEntry.isPresent()){
+                                        return;
+                                    }
+                                    opEntry.get().setDisplayName(Text.of(TextColors.WHITE, player.getName()));
+                                });
                             }
-                            opEntry.get().setDisplayName(Text.of(p.getName()));
-                        });
-                        src.sendMessage(Text.of(TextColors.GREEN, "Your role has been changed to ", message, "."));
+                        }
                     }
 
                     return CommandResult.success();
@@ -240,26 +322,80 @@ public class main {
         Sponge.getCommandManager().register(container, commandman, "role");
     }
 
-
     @Listener
-    public void onPlayerJoin(ClientConnectionEvent.Join e){
+    public void onPlayerJoin(ClientConnectionEvent.Join e) {
         Player player = e.getTargetEntity();
-        TabList tabList = player.getTabList();
-        Scoreboard scoreboard = player.getScoreboard();
+        scoreboard = player.getScoreboard();
+        if (player.hasPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.pink")){
             Random random = new Random();
-
             int nnumber = random.nextInt(999999999);
-
+            Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§d")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).color(TextColors.LIGHT_PURPLE).build();
+            teams.addMember(player.getTeamRepresentation());
+            scoreboard.registerTeam(teams);
+            Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                TabList tabList = p.getTabList();
+                Optional<TabListEntry> opEntry = tabList.getEntry(player.getUniqueId());
+                if(!opEntry.isPresent()){
+                    return;
+                }
+                opEntry.get().setDisplayName(Text.of(TextColors.LIGHT_PURPLE, player.getName()));
+            });
+        }else if (player.hasPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.blue")){
+            Random random = new Random();
+            int nnumber = random.nextInt(999999999);
+            Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§b")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).color(TextColors.AQUA).build();
+            teams.addMember(player.getTeamRepresentation());
+            scoreboard.registerTeam(teams);
+            Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                TabList tabList = p.getTabList();
+                Optional<TabListEntry> opEntry = tabList.getEntry(player.getUniqueId());
+                if(!opEntry.isPresent()){
+                    return;
+                }
+                opEntry.get().setDisplayName(Text.of(TextColors.AQUA, player.getName()));
+            });
+        }else {
+            Random random = new Random();
+            int nnumber = random.nextInt(999999999);
             Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§f")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).build();
             teams.addMember(player.getTeamRepresentation());
             scoreboard.registerTeam(teams);
-        Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
-            Optional<TabListEntry> opEntry = tabList.getEntry(p.getUniqueId());
-            if(!opEntry.isPresent()){
-                return;
-            }
-            opEntry.get().setDisplayName(Text.of(p.getName()));
-        });
+            Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                TabList tabList = p.getTabList();
+                Optional<TabListEntry> opEntry = tabList.getEntry(player.getUniqueId());
+                if(!opEntry.isPresent()){
+                    return;
+                }
+                opEntry.get().setDisplayName(Text.of(TextColors.WHITE, player.getName()));
+            });
+        }
+    }
+    @Listener
+    public void onPlayerDisconnect(ClientConnectionEvent.Disconnect e){
+        Player player = e.getTargetEntity();
+        scoreboard = player.getScoreboard();
+        if (player.hasPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.pink")){
+            Random random = new Random();
+            int nnumber = random.nextInt(999999999);
+            Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§d")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).color(TextColors.LIGHT_PURPLE).build();
+            teams.addMember(player.getTeamRepresentation());
+            scoreboard.registerTeam(teams);
+        }else if (player.hasPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.blue")){
+            player.getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.blue", Tristate.TRUE);
+            Random random = new Random();
+            int nnumber = random.nextInt(999999999);
+            Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§b")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).color(TextColors.AQUA).build();
+            teams.addMember(player.getTeamRepresentation());
+            scoreboard.registerTeam(teams);
+        }else {
+            player.getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.blue", Tristate.UNDEFINED);
+            player.getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.pink", Tristate.UNDEFINED);
+            Random random = new Random();
+            int nnumber = random.nextInt(999999999);
+            Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§f")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).build();
+            teams.addMember(player.getTeamRepresentation());
+            scoreboard.registerTeam(teams);
+        }
     }
 
 }
