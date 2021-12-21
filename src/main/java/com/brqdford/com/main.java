@@ -350,6 +350,19 @@ public class main {
                 }
                 opEntry.get().setDisplayName(Text.of(TextColors.LIGHT_PURPLE, player.getName()));
             });
+            Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                TabList tabList = player.getTabList();
+                Optional<TabListEntry> opEntry = tabList.getEntry(p.getUniqueId());
+                if(!opEntry.isPresent()){
+                    return;
+                }else if(p.hasPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.pink")){
+                    opEntry.get().setDisplayName(Text.of(TextColors.LIGHT_PURPLE, p.getName()));
+                }else if(p.hasPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.blue")){
+                    opEntry.get().setDisplayName(Text.of(TextColors.AQUA, p.getName()));
+                }else {
+                    opEntry.get().setDisplayName(Text.of(TextColors.WHITE, p.getName()));
+                }
+            });
         }else if (player.hasPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.blue")){
             Random random = new Random();
             int nnumber = random.nextInt(999999999);
@@ -363,6 +376,19 @@ public class main {
                     return;
                 }
                 opEntry.get().setDisplayName(Text.of(TextColors.AQUA, player.getName()));
+            });
+            Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                TabList tabList = player.getTabList();
+                Optional<TabListEntry> opEntry = tabList.getEntry(p.getUniqueId());
+                if(!opEntry.isPresent()){
+                    return;
+                }else if(p.hasPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.pink")){
+                    opEntry.get().setDisplayName(Text.of(TextColors.LIGHT_PURPLE, p.getName()));
+                }else if(p.hasPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.blue")){
+                    opEntry.get().setDisplayName(Text.of(TextColors.AQUA, p.getName()));
+                }else {
+                    opEntry.get().setDisplayName(Text.of(TextColors.WHITE, p.getName()));
+                }
             });
         }else {
             Random random = new Random();
@@ -378,33 +404,19 @@ public class main {
                 }
                 opEntry.get().setDisplayName(Text.of(TextColors.WHITE, player.getName()));
             });
-        }
-    }
-    @Listener
-    public void onPlayerDisconnect(ClientConnectionEvent.Disconnect e){
-        Player player = e.getTargetEntity();
-        scoreboard = player.getScoreboard();
-        if (player.hasPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.pink")){
-            Random random = new Random();
-            int nnumber = random.nextInt(999999999);
-            Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§d")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).color(TextColors.LIGHT_PURPLE).build();
-            teams.addMember(player.getTeamRepresentation());
-            scoreboard.registerTeam(teams);
-        }else if (player.hasPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.blue")){
-            player.getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.blue", Tristate.TRUE);
-            Random random = new Random();
-            int nnumber = random.nextInt(999999999);
-            Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§b")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).color(TextColors.AQUA).build();
-            teams.addMember(player.getTeamRepresentation());
-            scoreboard.registerTeam(teams);
-        }else {
-            player.getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.blue", Tristate.UNDEFINED);
-            player.getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.pink", Tristate.UNDEFINED);
-            Random random = new Random();
-            int nnumber = random.nextInt(999999999);
-            Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("§f")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).build();
-            teams.addMember(player.getTeamRepresentation());
-            scoreboard.registerTeam(teams);
+            Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                TabList tabList = player.getTabList();
+                Optional<TabListEntry> opEntry = tabList.getEntry(p.getUniqueId());
+                if(!opEntry.isPresent()){
+                    return;
+                }else if(p.hasPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.pink")){
+                    opEntry.get().setDisplayName(Text.of(TextColors.LIGHT_PURPLE, p.getName()));
+                }else if(p.hasPermission(SubjectData.GLOBAL_CONTEXT, "tabmanager.group.blue")){
+                    opEntry.get().setDisplayName(Text.of(TextColors.AQUA, p.getName()));
+                }else {
+                    opEntry.get().setDisplayName(Text.of(TextColors.WHITE, p.getName()));
+                }
+            });
         }
     }
 
