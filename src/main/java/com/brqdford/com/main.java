@@ -257,61 +257,71 @@ public class main {
                         src.sendMessage(Text.of(TextColors.RED, "You are not allowed to set this as your role."));
                     }else if (message.toLowerCase().contains("NEGR0".toLowerCase())) {
                         src.sendMessage(Text.of(TextColors.RED, "You are not allowed to set this as your role."));
-                    }else if (message.length() >= 11){
-                        src.sendMessage(Text.of(TextColors.RED, "Too many characters role can only be 10 characters or less."));
                     }else {
                         if (cooldown.containsKey(player.getName()) && Instant.now().minusSeconds(((Instant) cooldown.get(player.getName())).getEpochSecond()).getEpochSecond() < 10L) {
                             player.sendMessage((Text) Text.of("§cYou must wait " + (10L - Instant.now().minusSeconds(((Instant) cooldown.get(player.getName())).getEpochSecond()).getEpochSecond()) + " seconds to use this command."));
                             return CommandResult.success();
                         } else {
                             if (src.hasPermission("tabmanager.group.blue")) {
-                                cooldown.put(player.getName(), Instant.now());
-                                Random random = new Random();
-                                int nnumber = random.nextInt(999999999);
-                                Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("[", TextColors.DARK_AQUA, message, TextColors.WHITE, "]", TextColors.AQUA)).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).color(TextColors.AQUA).build();
-                                teams.addMember(player.getTeamRepresentation());
-                                scoreboard.registerTeam(teams);
-                                src.sendMessage(Text.of(TextColors.GREEN, "Your role has been changed to ", message, "."));
-                                Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
-                                    TabList tabList = p.getTabList();
-                                    Optional<TabListEntry> opEntry = tabList.getEntry(player.getUniqueId());
-                                    if(!opEntry.isPresent()){
-                                        return;
-                                    }
-                                    opEntry.get().setDisplayName(Text.of(TextColors.AQUA, player.getName()));
-                                });
+                                if (message.length() >= 9){
+                                    src.sendMessage(Text.of(TextColors.RED, "Too many characters role can only be 8 characters or less."));
+                                }else {
+                                    cooldown.put(player.getName(), Instant.now());
+                                    Random random = new Random();
+                                    int nnumber = random.nextInt(999999999);
+                                    Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("[", TextColors.DARK_AQUA, message, TextColors.WHITE, "]", TextColors.AQUA)).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).color(TextColors.AQUA).build();
+                                    teams.addMember(player.getTeamRepresentation());
+                                    scoreboard.registerTeam(teams);
+                                    src.sendMessage(Text.of(TextColors.GREEN, "Your role has been changed to ", message, "."));
+                                    Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                                        TabList tabList = p.getTabList();
+                                        Optional<TabListEntry> opEntry = tabList.getEntry(player.getUniqueId());
+                                        if(!opEntry.isPresent()){
+                                            return;
+                                        }
+                                        opEntry.get().setDisplayName(Text.of(TextColors.AQUA, player.getName()));
+                                    });
+                                }
                             } else if (src.hasPermission("tabmanager.group.pink")) {
-                                cooldown.put(player.getName(), Instant.now());
-                                Random random = new Random();
-                                int nnumber = random.nextInt(999999999);
-                                Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("[", TextColors.DARK_AQUA, message, TextColors.WHITE, "]", TextColors.LIGHT_PURPLE)).allowFriendlyFire(true).color(TextColors.LIGHT_PURPLE).canSeeFriendlyInvisibles(false).build();
-                                teams.addMember(player.getTeamRepresentation());
-                                scoreboard.registerTeam(teams);
-                                src.sendMessage(Text.of(TextColors.GREEN, "Your role has been changed to ", message, "."));
-                                Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
-                                    TabList tabList = p.getTabList();
-                                    Optional<TabListEntry> opEntry = tabList.getEntry(player.getUniqueId());
-                                    if(!opEntry.isPresent()){
-                                        return;
-                                    }
-                                    opEntry.get().setDisplayName(Text.of(TextColors.LIGHT_PURPLE, player.getName()));
-                                });
+                                if (message.length() >= 9){
+                                    src.sendMessage(Text.of(TextColors.RED, "Too many characters role can only be 8 characters or less."));
+                                }else {
+                                    cooldown.put(player.getName(), Instant.now());
+                                    Random random = new Random();
+                                    int nnumber = random.nextInt(999999999);
+                                    Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("[", TextColors.DARK_AQUA, message, TextColors.WHITE, "]", TextColors.LIGHT_PURPLE)).allowFriendlyFire(true).color(TextColors.LIGHT_PURPLE).canSeeFriendlyInvisibles(false).build();
+                                    teams.addMember(player.getTeamRepresentation());
+                                    scoreboard.registerTeam(teams);
+                                    src.sendMessage(Text.of(TextColors.GREEN, "Your role has been changed to ", message, "."));
+                                    Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                                        TabList tabList = p.getTabList();
+                                        Optional<TabListEntry> opEntry = tabList.getEntry(player.getUniqueId());
+                                        if(!opEntry.isPresent()){
+                                            return;
+                                        }
+                                        opEntry.get().setDisplayName(Text.of(TextColors.LIGHT_PURPLE, player.getName()));
+                                    });
+                                }
                             } else {
-                                cooldown.put(player.getName(), Instant.now());
-                                Random random = new Random();
-                                int nnumber = random.nextInt(999999999);
-                                Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("[", TextColors.DARK_AQUA, message, TextColors.WHITE, "]")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).build();
-                                teams.addMember(player.getTeamRepresentation());
-                                scoreboard.registerTeam(teams);
-                                src.sendMessage(Text.of(TextColors.GREEN, "Your role has been changed to ", message, "."));
-                                Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
-                                    TabList tabList = p.getTabList();
-                                    Optional<TabListEntry> opEntry = tabList.getEntry(player.getUniqueId());
-                                    if(!opEntry.isPresent()){
-                                        return;
-                                    }
-                                    opEntry.get().setDisplayName(Text.of(TextColors.WHITE, player.getName()));
-                                });
+                                if (message.length() >= 11){
+                                    src.sendMessage(Text.of(TextColors.RED, "Too many characters role can only be 10 characters or less."));
+                                }else {
+                                    cooldown.put(player.getName(), Instant.now());
+                                    Random random = new Random();
+                                    int nnumber = random.nextInt(999999999);
+                                    Team teams = Team.builder().name("t" + nnumber).prefix(Text.of("[", TextColors.DARK_AQUA, message, TextColors.WHITE, "]")).allowFriendlyFire(true).canSeeFriendlyInvisibles(false).build();
+                                    teams.addMember(player.getTeamRepresentation());
+                                    scoreboard.registerTeam(teams);
+                                    src.sendMessage(Text.of(TextColors.GREEN, "Your role has been changed to ", message, "."));
+                                    Sponge.getServer().getOnlinePlayers().stream().forEach(p -> {
+                                        TabList tabList = p.getTabList();
+                                        Optional<TabListEntry> opEntry = tabList.getEntry(player.getUniqueId());
+                                        if(!opEntry.isPresent()){
+                                            return;
+                                        }
+                                        opEntry.get().setDisplayName(Text.of(TextColors.WHITE, player.getName()));
+                                    });
+                                }
                             }
                         }
                     }
